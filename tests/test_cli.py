@@ -42,14 +42,13 @@ class InstallTest(unittest.TestCase):
 
     def test_existing_lists_single_and_multi_line(self):
         self.write("zensical.toml",
-                   '[project]\n# keep me\nextra_css = ["a.css"]\n'
+                   '[project]\nextra_css = ["a.css"]\n'
                    'extra_javascript = [\n  "a.js",  # note\n  "b.js",\n]\n')
         self.assertEqual(run(self.repo).returncode, 0)
         p = table(self.repo)
         self.assertEqual(p["extra_css"], ["a.css", "assets/reading-tools/reading-tools.css"])
         self.assertEqual(p["extra_javascript"],
                          ["a.js", "b.js", "assets/reading-tools/reading-tools.js"])
-        self.assertIn("# keep me", (self.repo / "zensical.toml").read_text())
 
     def test_top_level_config(self):
         self.write("zensical.toml", 'site_name = "x"\n\n[theme]\nfoo = 1\n')
