@@ -34,16 +34,19 @@ steps:
   - run: uvx zensical build --clean
 ```
 
-Pin a version with `uvx fix-zensical==0.1.0`. This repo's own
-[docs workflow](.github/workflows/docs.yml) does exactly this and publishes the demo site.
+To pin a version, use `uvx fix-zensical==0.1.0`. This repo's own
+[docs workflow](.github/workflows/docs.yml) runs the tool from the repo source
+(`uv run fix-zensical`) and publishes the demo site.
 
-Tips:
+Notes:
 
-- Several books in one repo: `uvx fix-zensical --shared docs-shared`.
-- If the workflow has a `paths:` filter, the tool warns when it doesn't cover the installed files
-  (`docs/assets/reading-tools/**`); add it so changes to them trigger a build.
-- Because configs are re-serialized, comments in `zensical.toml` are not kept in the file it
-  writes. That only matters if you run it locally and commit the result.
+- **Several books in one repo:** `uvx fix-zensical --shared docs-shared` keeps one copy of the
+  files and symlinks each book to it.
+- **`paths:` filter:** if your workflow only runs on some paths, the tool warns when the filter
+  doesn't cover the installed files (`docs/assets/reading-tools/**`). Add that path, or changes
+  to the tool's files won't trigger a build.
+- **Comments in `zensical.toml`** are dropped when the tool rewrites the file. That doesn't matter
+  in CI, where the result isn't committed. If you run it locally, don't commit the rewritten config.
 
 Zensical renders Mermaid into a closed shadow root; the script patches `Element.prototype.attachShadow`
 before diagrams render to reach the SVG.
