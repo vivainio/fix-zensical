@@ -30,6 +30,8 @@ jobs:
       - name: Verify they are installed
         run: uv run fix-zensical --check
       - run: uvx zensical build --clean
+      - name: Publish agent-quickstart.md verbatim
+        run: cp agent-quickstart.md site/agent-quickstart.md
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site

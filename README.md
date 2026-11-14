@@ -5,6 +5,9 @@ full-screen view, full-screen tables, and Nav / TOC / Wide layout toggles.
 
 Live demo (also the end-to-end test): https://vivainio.github.io/fix-zensical/
 
+For AI agents: [agent-quickstart.md](agent-quickstart.md), also served verbatim at
+https://vivainio.github.io/fix-zensical/agent-quickstart.md
+
 ```bash
 uvx fix-zensical             # install/update in every zensical*.toml in ./
 uvx fix-zensical --check     # change nothing; exit 1 if stale (for CI)

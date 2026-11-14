@@ -8,6 +8,9 @@ see here were registered by running `fix-zensical` before the build.
 - **Full-screen tables** for wide data. See [Tables](tables.md).
 - **Nav / TOC / Wide toggles** for the page layout.
 
+For AI agents: [agent-quickstart.md](https://vivainio.github.io/fix-zensical/agent-quickstart.md)
+(raw Markdown, includes a GitHub Actions workflow).
+
 ```bash
 uvx fix-zensical             # install/update in every zensical*.toml
 uvx fix-zensical --check     # exit 1 if stale (for CI)
