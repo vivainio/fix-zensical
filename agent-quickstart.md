@@ -78,7 +78,6 @@ custom_fences = [
 | `fix-zensical` | install/update in every `zensical*.toml` in `.` |
 | `fix-zensical --repo PATH` | use PATH as the repository root |
 | `fix-zensical --config FILE` | only these configs (repeatable) |
-| `fix-zensical --shared DIR` | keep one copy in DIR, symlink each book's files to it |
 | `fix-zensical --check` | change nothing; exit 1 if anything is missing or stale |
 | `fix-zensical --dry-run` | show what would change |
 

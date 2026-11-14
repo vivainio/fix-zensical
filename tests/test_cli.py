@@ -74,16 +74,14 @@ class InstallTest(unittest.TestCase):
         self.assertFalse((self.repo / "docs").exists())
         self.assertNotIn("extra_css", (self.repo / "zensical.toml").read_text())
 
-    def test_multiple_books_shared_symlinks(self):
+    def test_multiple_books(self):
         self.write("zensical.a.toml", '[project]\ndocs_dir = "a"\n')
         self.write("zensical.b.toml", '[project]\ndocs_dir = "b"\n')
-        r = run(self.repo, "--shared", "shared")
+        r = run(self.repo)
         self.assertEqual(r.returncode, 0, r.stderr)
         for book in "ab":
-            link = self.repo / book / "assets/reading-tools/reading-tools.css"
-            self.assertTrue(link.is_symlink())
-            self.assertEqual(link.read_text(), (self.repo / "shared/reading-tools.css").read_text())
-        self.assertEqual(run(self.repo, "--shared", "shared", "--check").returncode, 0)
+            self.assertTrue((self.repo / book / "assets/reading-tools/reading-tools.css").is_file())
+        self.assertEqual(run(self.repo, "--check").returncode, 0)
 
     def test_workflow_paths_warning(self):
         self.write("zensical.toml", '[project]\nsite_name = "x"\n')

@@ -11,7 +11,6 @@ Link this document to your AI agent to fix your Zensical: [agent-quickstart.md](
 uvx fix-zensical             # install/update in every zensical*.toml in ./
 uvx fix-zensical --check     # change nothing; exit 1 if stale (for CI)
 uvx fix-zensical --dry-run   # preview
-uvx fix-zensical --shared docs-shared   # several books: one shared copy, per-file symlinks
 ```
 
 It copies the files into `<docs_dir>/assets/reading-tools/` and appends them to `extra_css` /
@@ -40,8 +39,6 @@ To pin a version, use `uvx fix-zensical==0.1.0`. This repo's own
 
 Notes:
 
-- **Several books in one repo:** `uvx fix-zensical --shared docs-shared` keeps one copy of the
-  files and symlinks each book to it.
 - **`paths:` filter:** if your workflow only runs on some paths, the tool warns when the filter
   doesn't cover the installed files (`docs/assets/reading-tools/**`). Add that path, or changes
   to the tool's files won't trigger a build.

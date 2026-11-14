@@ -2,8 +2,7 @@
 """Install or check the zensical-publishing reading tools in a repository's books.
 
 For every Zensical config (zensical.toml, zensical.<name>.toml) this:
-  1. puts reading-tools.css/.js into <docs_dir>/assets/reading-tools/ (copy, or
-     per-file symlinks into a shared folder with --shared),
+  1. copies reading-tools.css/.js into <docs_dir>/assets/reading-tools/,
   2. registers them in extra_css / extra_javascript, appending to existing lists,
   3. reports whether the publish workflow's `paths:` filter covers the files.
 
@@ -11,7 +10,6 @@ Idempotent. Meant for build time: configs are re-serialized, so comments and
 formatting in them are not kept. Python 3.11+, no dependencies (tomli-w is vendored).
 
   fix-zensical                      install/update in ./ (all zensical*.toml)
-  fix-zensical --shared docs-shared symlink every book to one shared copy
   fix-zensical --check              change nothing; exit 1 if anything is stale
   fix-zensical --dry-run            show what would change
 """
@@ -19,7 +17,6 @@ formatting in them are not kept. Python 3.11+, no dependencies (tomli-w is vendo
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import sys
 import tomllib
@@ -48,19 +45,6 @@ def sync_copy(src: Path, dest: Path, apply: bool) -> str:
         if dest.is_symlink():
             dest.unlink()
         dest.write_bytes(src.read_bytes())
-    return status
-
-
-def sync_link(target: Path, dest: Path, apply: bool) -> str:
-    rel = os.path.relpath(target, dest.parent)
-    if dest.is_symlink() and os.readlink(dest) == rel:
-        return "ok"
-    status = "updated" if dest.exists() or dest.is_symlink() else "created"
-    if apply:
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        if dest.exists() or dest.is_symlink():
-            dest.unlink()
-        dest.symlink_to(rel)
     return status
 
 
@@ -101,7 +85,7 @@ def workflow_problems(repo: Path, files: list[str]) -> list[str]:
 # --- driver --------------------------------------------------------------------
 
 
-def process(cfg: Path, repo: Path, shared: Path | None, apply: bool) -> tuple[list[str], list[str]]:
+def process(cfg: Path, repo: Path, apply: bool) -> tuple[list[str], list[str]]:
     """Returns (report lines, problems)."""
     report: list[str] = []
     problems: list[str] = []
@@ -115,15 +99,7 @@ def process(cfg: Path, repo: Path, shared: Path | None, apply: bool) -> tuple[li
     for name in REGISTER.values():
         src = ASSETS / name
         dest = dest_dir / name
-        if shared is not None:
-            st = sync_copy(src, shared / name, apply)
-            touched.append((shared / name).relative_to(repo).as_posix())
-            if st != "ok":
-                report.append(f"  {st:8} {(shared / name).relative_to(repo)}")
-                problems.append(f"{shared / name}: {st}")
-            st = sync_link(shared / name, dest, apply)
-        else:
-            st = sync_copy(src, dest, apply)
+        st = sync_copy(src, dest, apply)
         touched.append(dest.relative_to(repo).as_posix())
         report.append(f"  {st:8} {dest.relative_to(repo)}")
         if st != "ok":
@@ -152,7 +128,6 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo", default=".", help="repository root (default: .)")
     ap.add_argument("--config", action="append", help="config file (repeatable; default: all zensical*.toml)")
-    ap.add_argument("--shared", help="shared folder (relative to repo): keep one copy there, symlink each book to it")
     ap.add_argument("--check", action="store_true", help="change nothing; exit 1 if anything is missing or stale")
     ap.add_argument("--dry-run", action="store_true", help="show what would change, change nothing")
     args = ap.parse_args()
@@ -164,13 +139,12 @@ def main() -> int:
     if not cfgs:
         print("no zensical*.toml found", file=sys.stderr)
         return 2
-    shared = repo / args.shared if args.shared else None
     apply = not (args.check or args.dry_run)
 
     all_problems = 0
     for cfg in cfgs:
         print(cfg.relative_to(repo))
-        report, problems = process(cfg, repo, shared, apply)
+        report, problems = process(cfg, repo, apply)
         print("\n".join(report))
         all_problems += len(problems)
     if args.check and all_problems:
