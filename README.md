@@ -29,7 +29,6 @@ steps:
   - uses: actions/checkout@v6
   - uses: astral-sh/setup-uv@v7
   - run: uvx fix-zensical          # add the reading tools
-  - run: uvx fix-zensical --check  # optional: fail if anything is still missing
   - run: uvx zensical build --clean
 ```
 

@@ -48,7 +48,6 @@ jobs:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
       - run: uvx fix-zensical            # install reading tools
-      - run: uvx fix-zensical --check    # fail if anything is still missing
       - run: uvx zensical build --clean
       - uses: actions/upload-pages-artifact@v5
         with:
