@@ -25,4 +25,4 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Run tests
-        run: uv run --python ${{ matrix.python-version }} --with pytest pytest tests/ -v
+        run: uv run --python ${{ matrix.python-version }} --with pytest --with zensical pytest tests/ -v

@@ -1,0 +1,37 @@
+name: Documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/configure-pages@v6
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Install reading tools (this repo's own code)
+        run: uv run fix-zensical
+      - name: Verify they are installed
+        run: uv run fix-zensical --check
+      - run: uvx zensical build --clean
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - uses: actions/deploy-pages@v5
+        id: deployment

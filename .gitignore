@@ -1,3 +1,5 @@
 dist/
 __pycache__/
 .venv/
+site/
+docs/assets/reading-tools/

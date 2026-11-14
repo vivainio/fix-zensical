@@ -1,0 +1,33 @@
+[project]
+site_name = "fix-zensical"
+site_description = "Reading tools for Zensical sites: zoomable Mermaid diagrams, full-screen tables, layout toggles."
+site_url = "https://vivainio.github.io/fix-zensical/"
+docs_dir = "docs"
+repo_url = "https://github.com/vivainio/fix-zensical"
+repo_name = "vivainio/fix-zensical"
+
+nav = [
+  { "Home" = "index.md" },
+  { "Diagrams" = "diagrams.md" },
+  { "Tables" = "tables.md" },
+]
+
+[project.theme]
+features = ["navigation.top", "content.code.copy"]
+
+[[project.theme.palette]]
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[project.markdown_extensions.tables]
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
