@@ -8,7 +8,7 @@ see here were registered by running `fix-zensical` before the build.
 - **Full-screen tables** for wide data. See [Tables](tables.md).
 - **Nav / TOC / Wide toggles** for the page layout.
 
-For AI agents: [agent-quickstart.md](https://vivainio.github.io/fix-zensical/agent-quickstart.md)
+Link this document to your AI agent to fix your Zensical: [agent-quickstart.md](https://vivainio.github.io/fix-zensical/agent-quickstart.md)
 (raw Markdown, includes a GitHub Actions workflow).
 
 ```bash
