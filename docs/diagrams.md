@@ -48,3 +48,14 @@ flowchart TD
     site --> pages[GitHub Pages]
     wf -. warns .-> pages
 ```
+
+## Custom colours
+
+In dark mode, nodes with their own fill keep it and get dark text.
+
+```mermaid
+flowchart LR
+    A[Input]:::green --> B[Process]:::blue --> C[Output]:::green
+    classDef green fill:#d5e8d4,stroke:#82b366
+    classDef blue fill:#dae8fc,stroke:#6c8ebf
+```

@@ -20,6 +20,75 @@
     return attachShadow.call(this, init);
   };
 
+  // Zensical's Mermaid theme colours every node from the page palette. A node
+  // given its own fill (classDef or style) keeps that fill, but its text then
+  // follows the palette, which in dark mode is light text on a light fill, and
+  // the theme repaints the parts of an ER entity that carry the fill only as an
+  // attribute. In the dark scheme only, apply those attribute fills to such
+  // nodes and make their text the colour the diagram gave it, or black; the
+  // light scheme is left exactly as Zensical draws it.
+  // Adapted from basware/onp-docs.
+  function isDark() {
+    return (document.body && document.body.getAttribute("data-md-color-scheme")) === "slate";
+  }
+
+  // Find the overrides a diagram needs: [element, property, value] triples.
+  function colourOverrides(svg) {
+    var list = [];
+    svg.querySelectorAll("g.node, g.cluster").forEach(function (node) {
+      var custom = Array.prototype.some.call(node.querySelectorAll("[style*='fill']"), function (shape) {
+        var fill = shape.style.fill;
+        return fill && fill !== "none" && fill !== "transparent";
+      });
+      if (!custom) return;
+      node.querySelectorAll("path[fill], rect[fill], polygon[fill]").forEach(function (shape) {
+        var fill = shape.getAttribute("fill");
+        if (fill !== "none" && !shape.style.fill) list.push([shape, "fill", fill]);
+      });
+      var coloured = node.querySelector("[style*='color']");
+      var colour = (coloured && coloured.style.color) || "#000";
+      node.querySelectorAll(".nodeLabel, .nodeLabel p, .label, text, tspan").forEach(function (label) {
+        list.push([label, "color", colour]);
+        if (label.namespaceURI === "http://www.w3.org/2000/svg") list.push([label, "fill", colour]);
+      });
+    });
+    return list;
+  }
+
+  function keepCustomColours(svg) {
+    if (!svg) return;
+    if (!svg.odOverrides) svg.odOverrides = colourOverrides(svg);
+    var dark = isDark();
+    svg.odOverrides.forEach(function (o) {
+      if (dark) o[0].style.setProperty(o[1], o[2], "important");
+      else o[0].style.removeProperty(o[1]);
+    });
+  }
+
+  // Zensical renders the diagram into the host's shadow root, and renders it
+  // again on a palette switch, so fix each SVG as it appears. A switch that
+  // does not re-render is caught by watching the scheme attribute.
+  var watched = [];
+  function watchColours(host) {
+    var root = host.shadowRoot;
+    if (!root || root.odWatched) return;
+    root.odWatched = true;
+    watched.push(root);
+    new MutationObserver(function () {
+      keepCustomColours(root.querySelector("svg"));
+    }).observe(root, { childList: true, subtree: true });
+    keepCustomColours(root.querySelector("svg"));
+  }
+  new MutationObserver(function () {
+    watched.forEach(function (root) {
+      keepCustomColours(root.querySelector("svg"));
+    });
+  }).observe(document.documentElement, {
+    attributes: true,
+    subtree: true,
+    attributeFilter: ["data-md-color-scheme"],
+  });
+
   var KEY = "onp-docs-layout";
   var FLAGS = { nav: "od-hide-nav", toc: "od-hide-toc", wide: "od-wide" };
 
@@ -273,6 +342,7 @@
   }
 
   function markDiagram(host) {
+    if (!host.closest(".od-overlay")) watchColours(host);
     if (host.dataset.odZoom || host.closest(".od-overlay")) return;
     host.dataset.odZoom = "1";
     host.tabIndex = 0;
